@@ -16,12 +16,15 @@ module Cucumber
 
           hack_to_support_io_streams
 
-          feature_server = DRbObject.new_with_uri("druby://localhost:#{port}")
+          feature_servers = [DRbObject.new_with_uri("druby://localhost:#{port}"), DRbObject.new_with_uri("druby://localhost:#{port+1}")]
 
           error_stream.extend DRb::DRbUndumped
           out_stream.extend DRb::DRbUndumped
 
-          feature_server.run(cloned_args(args), error_stream, out_stream)
+          feature_servers.each do |feature_server|
+            feature_server.run(cloned_args(args), error_stream, out_stream)
+          end
+
         rescue Exception => e
           raise e
         end
