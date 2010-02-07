@@ -15,7 +15,9 @@ module Cucumber
       end
 
       def run(args, error_stream, out_stream)
-        out_stream.puts "Running #{args}"
+        puts "Running Cucumber: #{args.join(' ')}"
+        out = %x[bin/cucumber #{args.join(" ")}]
+        out_stream.puts out
       end
 
     end
