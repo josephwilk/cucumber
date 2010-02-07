@@ -56,6 +56,10 @@ module Cucumber
         @options[:drb]
       end
 
+      def drb_server?
+        @options[:drb_server]
+      end
+
       def drb_port
         @options[:drb_port].to_i if @options[:drb_port]
       end

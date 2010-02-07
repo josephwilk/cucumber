@@ -7,6 +7,7 @@ require 'cucumber/feature_file'
 require 'cucumber/formatter/color_io'
 require 'cucumber/cli/configuration'
 require 'cucumber/cli/drb_client'
+require 'cucumber/cli/drb_server'
 
 module Cucumber
   module Cli
@@ -35,6 +36,15 @@ module Cucumber
 
       def execute!(step_mother)
         trap_interrupt
+
+        if configuration.drb_server?
+          begin
+            return DRbServer.run
+          rescue Exception => e
+            @error_stream.puts "WARNING: #{e.message}"
+          end
+        end
+
         if configuration.drb?
           begin
             return DRbClient.run(@args, @error_stream, @out_stream, configuration.drb_port)
@@ -42,6 +52,7 @@ module Cucumber
             @error_stream.puts "WARNING: #{e.message} Running features locally:"
           end
         end
+
         step_mother.options = configuration.options
         step_mother.log = configuration.log
 
@@ -57,7 +68,7 @@ module Cucumber
 
         runner = configuration.build_runner(step_mother, @out_stream)
         step_mother.visitor = runner # Needed to support World#announce
-        
+
         runner.visit_features(features)
 
         failure = if tag_excess.any?
